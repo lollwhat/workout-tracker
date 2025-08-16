@@ -1,14 +1,17 @@
 const express = require('express');
 const cors = require('cors');
-const mongoose = require('mongoose');
-const dotenv = require('dotenv');
+require('./loadEnvironment'); // Load environment variables
+const auth = require('./routes/auth');
+const protectedRoute = require('./routes/protectedRoute');
 
 const app = express();
+//Load routes
+app.use('/posts', posts);
+app.use('/auth', auth);
+app.use('/protected', protectedRoute);
 
-mongoose.connect("mongodb+srv://brandonlcw2004:<db_password>@cluster0.tg7u4me.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
-    .then(() => {
-        console.log('Connected to MongoDB');
-    })
-    .catch(err => {
-        console.log('Error connecting to MongoDB:', err);
-    })
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});

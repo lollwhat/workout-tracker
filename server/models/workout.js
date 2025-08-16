@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const workoutSchema = {
+    title: String,
     date: String,
     time: String,
     status: {
@@ -12,8 +13,8 @@ const workoutSchema = {
             type: String,
             enum: ['Normal Set', 'Warmup Set', 'Drop Set', 'Failure Set']
         },
-        notes: String,
         name: String,
+        notes: String,
         reps: Number,
         weight: Number,
     }],
