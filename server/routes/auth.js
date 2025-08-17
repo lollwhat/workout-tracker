@@ -1,9 +1,9 @@
 const express = require('express');
-const router = express.router();
-const User = require('../models/User');
+const router = express.Router();
+const User = require('../models/user');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const redisClient = require('../config/redis');
+const BlacklistedToken = require('../models/blacklistedToken');
 
 //User Registration
 router.post('/register', async (req, res) => {
@@ -24,16 +24,16 @@ router.post('/register', async (req, res) => {
 //User Login
 router.post("/login", async (req, res) => {
     try {
-        const [username, password] = req.body;
-        const user = await User.findOne({username});
-        if(!user) {
+        const { username, password } = req.body;
+        const user = await User.findOne({ username });
+        if (!user) {
             return res.status(400).json({ error: 'Invalid username or password' });
         }
-        const passwordMatch = bcrypt.compare(password, user.password);
-        if(passwordMatch){
+        const passwordMatch = await bcrypt.compare(password, user.password);
+        if (passwordMatch) {
             const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
             res.status(200).json({ token });
-        }else{
+        } else {
             res.status(400).json({ error: 'Invalid username or password' });
         }
     } catch (error) {
@@ -56,21 +56,15 @@ router.delete("/logout", async (req, res) => {
             return res.status(400).json({ error: 'Invalid token' });
         }
 
-        const expirationTime = decodedToken.exp;
-        const currentTime = Math.floor(Date.now() / 1000);
+        const expiresAt = new Date(decodedToken.exp * 1000);
 
-        const timeToExpire = expirationTime - currentTime;
-        if(timeToExpire > 0){
-            await redisClient.set(token, 'blacklisted', {
-                'EX' : timeToExpire
-            });
-        }
+        await BlacklistedToken.create({ token, expiresAt });
 
         res.status(200).send('Logged out successfully');
     } catch (error) {
         console.error('Logout error:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
-})
+});
 
 module.exports = router;

@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const redisClient = require('../config/redis');
+const BlacklistedToken = require('../models/blacklistedToken');
 
 async function verifyToken(req, res, next){
     const authHeader = req.headers['authorization'];
@@ -8,7 +8,7 @@ async function verifyToken(req, res, next){
         return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    const isBlackListed = await redisClient.get(token);
+    const isBlackListed = await BlacklistedToken.findOne({ token });
     if (isBlackListed) {
         return res.status(403).send('Token is blacklisted');
     }
@@ -21,5 +21,6 @@ async function verifyToken(req, res, next){
         return res.status(401).json({ error: 'Unauthorized' });
     }
 }
+console.log(typeof verifyToken);
 
-module.exports = verifyToken
+module.exports = verifyToken;

@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const Workout = require("../models/Workout");
+const Workout = require("../models/workout");
 
 //Get all workouts
 router.get("/", async (req, res) => {
@@ -88,3 +88,5 @@ router.delete("/:id", getWorkout, async (req, res) => {
         res.status(500).json({message: err.message});
     }
 })
+
+module.exports = router;

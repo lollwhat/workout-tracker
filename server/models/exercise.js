@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const exerciseSchema = {
+const exerciseSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
@@ -15,6 +15,8 @@ const exerciseSchema = {
         enum: ['Chest', 'Back', 'Legs', 'Arms', 'Shoulders', 'Core']
     },
 
-}
+});
 
 const Exercise = mongoose.model('Exercise', exerciseSchema);
+
+module.exports = Exercise;
