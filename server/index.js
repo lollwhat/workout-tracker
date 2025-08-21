@@ -8,6 +8,8 @@ const protectedRoute = require('./routes/protectedRoute');
 
 const app = express();
 app.use(express.json());
+app.use(cors());
+app.use(express.urlencoded({ extended: true }));
 //Load routes
 app.use('/posts', posts);
 app.use('/auth', auth);
